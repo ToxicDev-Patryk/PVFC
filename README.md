@@ -40,7 +40,7 @@ PolyVerge Flux Cipher (PVFC) is an advanced encryption algorithm designed to pro
 
 ## Implementation
 
-The algorithm is implemented in Python, demonstrating its functionality with encryption and decryption functions. The code includes helper functions for character-to-number conversion, key generation, and the main encryption/decryption logic.
+The algorithm is implemented in Python/JavaScript, demonstrating its functionality with encryption and decryption functions. The code includes helper functions for character-to-number conversion, key generation, and the main encryption/decryption logic.
 
 ## Security Considerations
 
