@@ -1,20 +1,45 @@
 import random
+import time
 
 def char_to_num(a):
+    if not isinstance(a, str):
+        raise ValueError("Input must be a string.")
     return ''.join(str(ord(b)).zfill(3) for b in a)
 
 def num_to_char(a):
+    if not isinstance(a, str) or len(a) % 3 != 0:
+        raise ValueError("Input must be a string with a length that is a multiple of 3.")
     return ''.join(chr(int(a[b:b+3])) for b in range(0, len(a), 3))
 
-def generate_keys(a, b):
-    return [generate_key(b) for _ in range(a)]
+def generate_key(length):
+    random.seed(int(time.time() * (random.randint(1000, 64000) * random.randint(1, 255))))
+    random_bytes = [random.randint(0, 255) for _ in range(length * 16)]
+    key = custom_hash(random_bytes) % (2 ** (length * 8))
+    key = apply_bitwise_operations(key)
+    key_hex = hex(key)[2:].zfill(length * 2)
+    return key_hex
 
-def generate_key(a):
-    return ''.join(hex(random.randint(0, 255))[2:].zfill(2) for _ in range(a))
+def custom_hash(random_bytes):
+    hash_value = 0
+    for byte in random_bytes:
+        hash_value ^= byte
+        hash_value = (hash_value << 5) - hash_value
+    return hash_value
+
+def apply_bitwise_operations(key):
+    key = key ^ (key << 13) & 0xFFFFFFFFFFFFFFFF
+    key = key ^ (key >> 7) & 0xFFFFFFFFFFFFFFFF
+    key = key ^ (key << 3) & 0xFFFFFFFFFFFFFFFF
+    return key
+
+def generate_keys(num_keys, key_length):
+    return [generate_key(key_length) for _ in range(num_keys)]
 
 c = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 def encrypt(x, y):
+    if not isinstance(x, str) or not isinstance(y, list) or not all(isinstance(k, str) for k in y):
+        raise ValueError("Invalid input for encryption.")
     z = ''
     a = max(len(b) for b in y)
     for d in range(0, a, 2):
@@ -53,6 +78,8 @@ def encrypt(x, y):
     return s
 
 def decrypt(x, y):
+    if not isinstance(x, str) or not isinstance(y, list) or not all(isinstance(k, str) for k in y):
+        raise ValueError("Invalid input for decryption.")
     z = ""
     
     for a in range(0, len(x), 2):
@@ -95,7 +122,7 @@ if __name__ == "__main__":
     print("Numerical Representation:", output_num)
 
     num_keys = 4
-    key_length = 16
+    key_length = 32
     keys = generate_keys(num_keys, key_length)
     print("Generated Keys:", keys)
 
@@ -107,3 +134,8 @@ if __name__ == "__main__":
 
     decrypted_str = num_to_char(decrypted_num)
     print("Decrypted String:", decrypted_str)
+
+    if input_str == decrypted_str:
+        print("Success: The original string matches the decrypted string.")
+    else:
+        print("Error: The original string does not match the decrypted string.")
